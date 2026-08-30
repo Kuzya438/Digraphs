@@ -11,14 +11,16 @@ int** create_two_dim_array(int N) {
     return ptrArray;
 }
 
-void dfs(int** graph, int N, bool* visited, std::deque<int>& order, int vertex = 0) {
-    visited[vertex] = true;
+void dfs(int** graph, int N, int* visited, std::deque<int>& order, int vertex = 0) {
+    visited[vertex] = 1;
 
     for (int i{}; i < N; ++i) {
-        if (graph[vertex][i] == 1 && visited[i] == false) {
-            dfs(graph, N, visited, order, i);
+        if (graph[vertex][i] == 1) {
+            if (visited[i] == 0) { dfs(graph, N, visited, order, i); }
+            else if (visited[i] == 1) { return; }
         }
     }
+    visited[vertex] = 2;
 
     order.push_front(vertex);
 }
@@ -29,7 +31,7 @@ int main() {
     int N{};
     int** orgraph{ nullptr };
     std::deque<int> order{};
-    bool* visited{ nullptr };
+    int* visited{ nullptr };
 
     std::ifstream data("input.txt");
     if (!data.is_open()) {
@@ -47,19 +49,16 @@ int main() {
 
     data.close();
 
-    visited = new bool[N];
+    visited = new int[N] {};
     for (int i{}; i < N; ++i) {
-        visited[i] = false;
-    }
-
-    for (int i{}; i < N; ++i) {
-        if (!visited[i]) { dfs(orgraph, N, visited, order, i); }
+        if (visited[i] == 0) { dfs(orgraph, N, visited, order, i); }
     }
 
     std::cout << "Топологический порядок вершин: ";
     for (int i{}; i < N; ++i) {
         std::cout << order[i] + 1 << " ";
     }
+    std::cout << std::endl;
 
     for (int i{}; i < N; ++i) {
         delete[] orgraph[i];
